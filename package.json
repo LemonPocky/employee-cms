@@ -1,0 +1,27 @@
+{
+  "name": "employee-cms",
+  "version": "1.0.0",
+  "description": "Command-line interface for managing (pseudo) employees, managers, and departments in a MySQL database.",
+  "main": "index.js",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "dotenv": "^10.0.0",
+    "inquirer": "^8.1.2",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LemonPocky/employee-cms.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LemonPocky/employee-cms/issues"
+  },
+  "homepage": "https://github.com/LemonPocky/employee-cms#readme"
+}
