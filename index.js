@@ -6,6 +6,9 @@ require('dotenv').config();
 // Used for an interactive command prompt
 const inquirer = require('inquirer');
 
+// Used to nicely format tables
+const consoleTable = require('console.table');
+
 // Contains employee database methods
 const EmployeeCMSDB = require('./db/EmployeeCMSDB');
 
@@ -44,6 +47,7 @@ async function mainMenu() {
       type: 'list',
       choices: [
         "View All Employees",
+        "View All Roles",
         "Exit"
       ]
     }
@@ -51,8 +55,11 @@ async function mainMenu() {
 
   // Pick next action based on the user's choice
   switch(answer.menuChoice) {
-    case 'View All Employees':
+    case "View All Employees":
       viewAllEmployees();
+      break;
+    case "View All Roles":
+      viewAllRoles();
       break;
     default:
       exit();
@@ -60,7 +67,16 @@ async function mainMenu() {
 }
 
 // Displays all employees and their information
-function viewAllEmployees() {
+async function viewAllEmployees() {
+  const result = await db.selectAllEmployeesFullDetails();
+  console.table(result);
+  mainMenu();
+}
+
+// Displays all roles and their department
+async function viewAllRoles() {
+  const result = await db.selectRolesFullDetails();
+  console.table(result);
   mainMenu();
 }
 
