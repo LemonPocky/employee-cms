@@ -25,7 +25,34 @@ async function run() {
 }
 
 async function mainMenu() {
+  const answer = await inquirer.prompt([
+    {
+      message: 'MAIN MENU: What would you like to do?',
+      name: 'menuChoice',
+      type: 'list',
+      choices: [
+        "View All Employees",
+        "Exit"
+      ]
+    }
+  ]);
 
+  switch(answer.menuChoice) {
+    case 'View All Employees':
+      viewAllEmployees();
+      break;
+    default:
+      exit();
+  }
 }
 
-  run();
+function viewAllEmployees() {
+  mainMenu();
+}
+
+function exit() {
+  console.log('Goodbye!');
+  process.exit(0);
+}
+
+run();
