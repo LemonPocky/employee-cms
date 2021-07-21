@@ -17,7 +17,7 @@ class EmployeeCMSDB {
 
   // Establish a connection to the Employee CMS database.
   // Returns a promise that resolves once the connection is successful
-  connect() {
+  async connect() {
     this.connection = mysql.createConnection(this.config);
     this.connection.connect = util.promisify(this.connection.connect);
     return this.connection.connect();

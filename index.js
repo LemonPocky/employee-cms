@@ -1,8 +1,15 @@
+// Grabs our sensitive database information from .env
+// If you don't have a .env file yet, make a copy of .env.EXAMPLE, rename
+// it to .env, and fill out the fields (do not use quotes).
 require('dotenv').config();
+
+// Used for an interactive command prompt
 const inquirer = require('inquirer');
 
+// Contains employee database methods
 const EmployeeCMSDB = require('./db/EmployeeCMSDB');
 
+// Create a new database object with connection parameters
 const db = new EmployeeCMSDB(
   'localhost',
   3306,
@@ -11,7 +18,9 @@ const db = new EmployeeCMSDB(
   process.env.DB_NAME,
 );
 
+// Entry method into our program
 async function run() {
+  // Try to connect to the database. Exits the program if there's an error.
   try {
     await db.connect();
     console.log("Connected to database.");
@@ -20,10 +29,13 @@ async function run() {
     return;
   }
 
+  // On successful database connect
   console.log('Welcome to the EMPLOYEE MANAGER! Ver. 0.01a');
   mainMenu();
 }
 
+// Displays the main menu of the program
+// We return here after every user cycle
 async function mainMenu() {
   const answer = await inquirer.prompt([
     {
@@ -37,6 +49,7 @@ async function mainMenu() {
     }
   ]);
 
+  // Pick next action based on the user's choice
   switch(answer.menuChoice) {
     case 'View All Employees':
       viewAllEmployees();
@@ -46,13 +59,16 @@ async function mainMenu() {
   }
 }
 
+// Displays all employees and their information
 function viewAllEmployees() {
   mainMenu();
 }
 
+// Exits the program
 function exit() {
   console.log('Goodbye!');
   process.exit(0);
 }
 
+// Run the program
 run();
