@@ -66,6 +66,21 @@ class EmployeeCMSDB {
     return this.connection.query(query);
   }
 
+  async selectDepartmentsWithId() {
+    const query = `
+      SELECT 
+        id,
+        name
+      FROM department;`;
+    return this.connection.query(query);
+  }
+
+  // Inserts the role object into the role table
+  async insertRole(role) {
+    const query = `INSERT INTO role SET ?`;
+    return this.connection.query(query, role);
+  }
+
   // Inserts the department object into department table
   async insertDepartment(department) {
     const query = `INSERT INTO department SET ?`;

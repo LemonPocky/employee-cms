@@ -49,6 +49,7 @@ async function mainMenu() {
         "View All Employees",
         "View All Roles",
         "View All Departments",
+        "Add a Role",
         "Add a Department",
         "Exit"
       ]
@@ -65,6 +66,9 @@ async function mainMenu() {
       break;
     case "View All Departments":
       viewAllDepartments();
+      break;
+    case "Add a Role":
+      addRole();
       break;
     case "Add a Department":
       addDepartment();
@@ -107,6 +111,46 @@ async function viewAllDepartments() {
   mainMenu();
 }
 
+// Add a role
+async function addRole() {
+  const answer = await inquirer.prompt([
+    {
+      message: "What is the name of the role you would like to add?",
+      name: "roleName",
+      type: "input",
+    },
+    {
+      message: "What is the salary of the role?",
+      name: "roleSalary",
+      type: "input",
+    },
+    {
+      message: "What is the department of the role?",
+      name: "roleDepartment",
+      type: "list",
+      choices: listDepartments,
+    },
+  ]);
+  try {
+    const salary = answer.roleSalary;
+    if (isNaN(salary) && salary <= 0) {
+      throw new Error("Salary must be a valid positive number.");
+    }
+
+    const role = {title: answer.roleName, salary: answer.roleSalary, department_id: answer.roleDepartment};
+    const result = await db.insertRole(role);
+    // If the insert was successful, affectedRows = 1
+    if (result.affectedRows) {
+      console.log(`Role ${answer.roleName} added.`);
+    } else {
+      console.log(`Error adding role.`);
+    }
+  } catch (error) {
+    console.log(`Error adding role: ${error.message}`);
+  }
+  mainMenu();
+}
+
 // Add new department
 async function addDepartment() {
   const answer = await inquirer.prompt([
@@ -131,6 +175,17 @@ async function addDepartment() {
     console.log(`Error adding department: ${error.message}`);
   }
   mainMenu();
+}
+
+// Helper function that returns an array of objects for departments
+// {name: , id:}
+async function listDepartments() {
+  const results = await db.selectDepartmentsWithId();
+  return results.map((item) => {
+    // This mapping makes it so that the names of the departments are shown in the CLI,
+    // but the answers hash actually gets the id of the department as a value!
+    return {name: item.name, value: item.id};
+  })
 }
 
 // Exits the program

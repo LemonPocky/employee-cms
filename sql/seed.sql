@@ -8,8 +8,8 @@ USE employee_cms_db;
 
 INSERT INTO department (name)
 VALUES 
-  ("sushi"),
-  ("ramen");
+  ("Sushi"),
+  ("Ramen");
 
 INSERT INTO role (title, salary, department_id)
 VALUES
