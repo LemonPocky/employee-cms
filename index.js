@@ -48,6 +48,8 @@ async function mainMenu() {
       choices: [
         "View All Employees",
         "View All Roles",
+        "View All Departments",
+        "Add a Department",
         "Exit"
       ]
     }
@@ -61,6 +63,12 @@ async function mainMenu() {
     case "View All Roles":
       viewAllRoles();
       break;
+    case "View All Departments":
+      viewAllDepartments();
+      break;
+    case "Add a Department":
+      addDepartment();
+      break;
     default:
       exit();
   }
@@ -68,15 +76,60 @@ async function mainMenu() {
 
 // Displays all employees and their information
 async function viewAllEmployees() {
-  const result = await db.selectAllEmployeesFullDetails();
-  console.table(result);
+  try {
+    const result = await db.selectEmployeesFullDetails();
+    console.table(result);
+  } catch (error) {
+    console.log(error);
+  }
   mainMenu();
 }
 
 // Displays all roles and their department
 async function viewAllRoles() {
-  const result = await db.selectRolesFullDetails();
-  console.table(result);
+  try {
+    const result = await db.selectRolesFullDetails();
+    console.table(result);
+  } catch (error) {
+    console.log(error);
+  }
+  mainMenu();
+}
+
+// Display all departments
+async function viewAllDepartments() {
+  try {
+    const result = await db.selectDepartments();
+    console.table(result);
+  } catch (error) {
+    console.log(error);
+  }
+  mainMenu();
+}
+
+// Add new department
+async function addDepartment() {
+  const answer = await inquirer.prompt([
+    {
+      message: "What is the name of the department you would like to add?",
+      name: "departmentName",
+      type: "input",
+    },
+  ]);
+  try {
+    // Wrap department name in an object
+    const department = {name: answer.departmentName};
+    // Call database to add department object
+    const result = await db.insertDepartment(department);
+    // If the insert was successful, affectedRows = 1
+    if (result.affectedRows) {
+      console.log(`Department ${answer.departmentName} added.`);
+    } else {
+      console.log(`Error adding department.`);
+    }
+  } catch (error) {
+    console.log(`Error adding department: ${error.message}`);
+  }
   mainMenu();
 }
 

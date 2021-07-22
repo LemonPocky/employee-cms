@@ -27,7 +27,7 @@ class EmployeeCMSDB {
     return this.connection.connect();
   }
 
-  async selectAllEmployeesFullDetails() {
+  async selectEmployeesFullDetails() {
     const query = `
       SELECT 
         e.id,
@@ -58,6 +58,19 @@ class EmployeeCMSDB {
     return this.connection.query(query);
   }
 
+  async selectDepartments() {
+    const query = `
+      SELECT 
+        name
+      FROM department;`;
+    return this.connection.query(query);
+  }
+
+  // Inserts the department object into department table
+  async insertDepartment(department) {
+    const query = `INSERT INTO department SET ?`;
+    return this.connection.query(query, department);
+  }
 }
 
 module.exports = EmployeeCMSDB;
