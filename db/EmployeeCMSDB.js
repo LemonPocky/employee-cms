@@ -27,6 +27,8 @@ class EmployeeCMSDB {
     return this.connection.connect();
   }
 
+  // Returns all employees with their:
+  // ID, FirstLast Name, Title, Salary, Department, Manager
   async selectEmployeesFullDetails() {
     const query = `
       SELECT 
@@ -46,6 +48,8 @@ class EmployeeCMSDB {
     return this.connection.query(query);
   }
 
+  // Returns all roles with their:
+  // Title, Salary, Department
   async selectRolesFullDetails() {
     const query = `
       SELECT 
@@ -66,6 +70,24 @@ class EmployeeCMSDB {
     return this.connection.query(query);
   }
 
+  async selectEmployeesWithId() {
+    const query = `
+      SELECT 
+        id,
+        CONCAT(first_name, " ", last_name) AS employeeName
+      FROM employee;`;
+    return this.connection.query(query);
+  }
+
+  async selectRolesWithId() {
+    const query = `
+      SELECT 
+        id,
+        title
+      FROM role;`;
+    return this.connection.query(query);
+  }
+
   async selectDepartmentsWithId() {
     const query = `
       SELECT 
@@ -73,6 +95,12 @@ class EmployeeCMSDB {
         name
       FROM department;`;
     return this.connection.query(query);
+  }
+
+  // Inserts the employee object into the employee table
+  async insertEmployee(employee) {
+    const query = `INSERT INTO employee SET ?`;
+    return this.connection.query(query, employee);
   }
 
   // Inserts the role object into the role table

@@ -49,6 +49,7 @@ async function mainMenu() {
         "View All Employees",
         "View All Roles",
         "View All Departments",
+        "Add an Employee",
         "Add a Role",
         "Add a Department",
         "Exit"
@@ -66,6 +67,9 @@ async function mainMenu() {
       break;
     case "View All Departments":
       viewAllDepartments();
+      break;
+    case "Add an Employee":
+      addEmployee();
       break;
     case "Add a Role":
       addRole();
@@ -111,9 +115,62 @@ async function viewAllDepartments() {
   mainMenu();
 }
 
+// Add an Employee
+async function addEmployee() {
+  const answers = await inquirer.prompt([
+    {
+      message: "What is the first name of the employee you would like you add?",
+      name: "employeeFirstName",
+      type: "input",
+    },
+    {
+      message: "What is the last name of the employee?",
+      name: "employeeLastName",
+      type: "input",
+    },
+    {
+      message: "What is the role of the employee?",
+      name: "employeeRole",
+      type: "list",
+      choices: listRoles,
+    },
+    {
+      message: "Who is the manager of the employee?",
+      name: "employeeManager",
+      type: "list",
+      // We need to add a blank choice if the employee has no manager
+      choices: async function () {
+        const employees = await listEmployees();
+        employees.push({ name: "N/A", value: null });
+        return employees;
+      },
+    },
+  ]);
+  try {
+    // Wrap employee in an object
+    const employee = { 
+      first_name: answers.employeeFirstName,
+      last_name: answers.employeeLastName,
+      role_id: answers.employeeRole,
+      manager_id: answers.employeeManager,
+    };
+    // Call database to add employee object
+    const result = await db.insertEmployee(employee);
+    // If the insert was successful, affectedRows = 1
+    if (result.affectedRows) {
+      console.log(`${answers.employeeFirstName} ${answers.employeeLastName} added to Employees.`);
+    } else {
+      console.log(`Error adding employee.`);
+    }
+  } catch (error) {
+    console.log(`Error adding employee: ${error.message}`);
+  }
+  mainMenu();
+}
+
 // Add a role
 async function addRole() {
-  const answer = await inquirer.prompt([
+  const answers = await inquirer.prompt([
     {
       message: "What is the name of the role you would like to add?",
       name: "roleName",
@@ -132,16 +189,17 @@ async function addRole() {
     },
   ]);
   try {
-    const salary = answer.roleSalary;
+    const salary = answers.roleSalary;
+    // Check if salary is a valid number above 0
     if (isNaN(salary) && salary <= 0) {
       throw new Error("Salary must be a valid positive number.");
     }
 
-    const role = {title: answer.roleName, salary: answer.roleSalary, department_id: answer.roleDepartment};
+    const role = {title: answers.roleName, salary: answers.roleSalary, department_id: answers.roleDepartment};
     const result = await db.insertRole(role);
     // If the insert was successful, affectedRows = 1
     if (result.affectedRows) {
-      console.log(`Role ${answer.roleName} added.`);
+      console.log(`${answers.roleName} added to Roles.`);
     } else {
       console.log(`Error adding role.`);
     }
@@ -167,7 +225,7 @@ async function addDepartment() {
     const result = await db.insertDepartment(department);
     // If the insert was successful, affectedRows = 1
     if (result.affectedRows) {
-      console.log(`Department ${answer.departmentName} added.`);
+      console.log(`${answer.departmentName} added to Departments.`);
     } else {
       console.log(`Error adding department.`);
     }
@@ -175,6 +233,24 @@ async function addDepartment() {
     console.log(`Error adding department: ${error.message}`);
   }
   mainMenu();
+}
+
+// Helper function that returns an array of objects for employees
+// {employeeName: , id: }
+async function listEmployees() {
+  const results = await db.selectEmployeesWithId();
+  return results.map((item) => {
+    return { name: item.employeeName, value: item.id };
+  });
+}
+
+// Helper function that returns an array of objects for roles
+// {title: , id: }
+async function listRoles() {
+  const results = await db.selectRolesWithId();
+  return results.map((item) => {
+    return { name: item.title, value: item.id };
+  });
 }
 
 // Helper function that returns an array of objects for departments
