@@ -114,6 +114,15 @@ class EmployeeCMSDB {
     const query = `INSERT INTO department SET ?`;
     return this.connection.query(query, department);
   }
+
+  // Update the employee
+  async updateEmployee(employee, id) {
+    const query = `
+      UPDATE employee 
+      SET ? 
+      WHERE id = ?`;
+    return this.connection.query(query, [employee, id]);
+  }
 }
 
 module.exports = EmployeeCMSDB;

@@ -50,6 +50,7 @@ async function mainMenu() {
         "View All Roles",
         "View All Departments",
         "Add an Employee",
+        "Update an Employee's Role",
         "Add a Role",
         "Add a Department",
         "Exit"
@@ -58,28 +59,32 @@ async function mainMenu() {
   ]);
 
   // Pick next action based on the user's choice
-  switch(answer.menuChoice) {
+  switch (answer.menuChoice) {
     case "View All Employees":
-      viewAllEmployees();
+      await viewAllEmployees();
       break;
     case "View All Roles":
-      viewAllRoles();
+      await viewAllRoles();
       break;
     case "View All Departments":
-      viewAllDepartments();
+      await viewAllDepartments();
       break;
     case "Add an Employee":
-      addEmployee();
+      await addEmployee();
+      break;
+    case "Update an Employee's Role":
+      await updateEmployeeRole();
       break;
     case "Add a Role":
-      addRole();
+      await addRole();
       break;
     case "Add a Department":
-      addDepartment();
+      await addDepartment();
       break;
     default:
       exit();
   }
+  mainMenu();
 }
 
 // Displays all employees and their information
@@ -90,7 +95,6 @@ async function viewAllEmployees() {
   } catch (error) {
     console.log(error);
   }
-  mainMenu();
 }
 
 // Displays all roles and their department
@@ -101,7 +105,6 @@ async function viewAllRoles() {
   } catch (error) {
     console.log(error);
   }
-  mainMenu();
 }
 
 // Display all departments
@@ -112,7 +115,6 @@ async function viewAllDepartments() {
   } catch (error) {
     console.log(error);
   }
-  mainMenu();
 }
 
 // Add an Employee
@@ -165,7 +167,42 @@ async function addEmployee() {
   } catch (error) {
     console.log(`Error adding employee: ${error.message}`);
   }
-  mainMenu();
+}
+
+// Update an employee's roles
+async function updateEmployeeRole() {
+  const answers = await inquirer.prompt([
+    {
+      message: "Which employee you would like to update?",
+      name: "employeeId",
+      type: "list",
+      choices: listEmployees,
+    },
+    {
+      message: "What is the role of the employee?",
+      name: "roleId",
+      type: "list",
+      choices: listRoles,
+    }
+  ]);
+  try {
+    // Wrap the columns to update in an object
+    const employee = {
+      role_id: answers.roleId,
+    };
+    // Call database to update employee object
+    const result = await db.updateEmployee(employee, answers.employeeId);
+    // If the update was successful, affectedRows = 1
+    if (result.affectedRows) {
+      console.log(
+        `Role updated.`
+      );
+    } else {
+      console.log(`Error updating employee.`);
+    }
+  } catch (error) {
+    console.log(`Error updating employee: ${error.message}`);
+  }
 }
 
 // Add a role
@@ -206,7 +243,6 @@ async function addRole() {
   } catch (error) {
     console.log(`Error adding role: ${error.message}`);
   }
-  mainMenu();
 }
 
 // Add new department
@@ -232,7 +268,6 @@ async function addDepartment() {
   } catch (error) {
     console.log(`Error adding department: ${error.message}`);
   }
-  mainMenu();
 }
 
 // Helper function that returns an array of objects for employees
