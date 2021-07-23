@@ -51,6 +51,7 @@ async function mainMenu() {
         "View All Departments",
         "Add an Employee",
         "Update an Employee's Role",
+        "Update an Employee's Manager",
         "Add a Role",
         "Add a Department",
         "Exit"
@@ -74,6 +75,9 @@ async function mainMenu() {
       break;
     case "Update an Employee's Role":
       await updateEmployeeRole();
+      break;
+    case "Update an Employee's Manager":
+      await updateEmployeeManager();
       break;
     case "Add a Role":
       await addRole();
@@ -197,6 +201,50 @@ async function updateEmployeeRole() {
       console.log(
         `Role updated.`
       );
+    } else {
+      console.log(`Error updating employee.`);
+    }
+  } catch (error) {
+    console.log(`Error updating employee: ${error.message}`);
+  }
+}
+
+// Update employee manager
+async function updateEmployeeManager () {
+  const employeeAnswer = await inquirer.prompt([
+    {
+      message: "Which employee you would like to update?",
+      name: "employeeId",
+      type: "list",
+      choices: listEmployees,
+    },
+  ]);
+  // We need to chain a new inquirer prompt so that our manager choices can filter out
+  // the employee currently selected
+  const managerAnswer = await inquirer.prompt([
+    {
+      message: "Who is the manager of the employee?",
+      name: "managerId",
+      type: "list",
+      // We need to add a blank choice if the employee has no manager
+      // We also need to not list an employee as their own manager
+      choices: async function () {
+        const employees = await listEmployees();
+        employees.push({ name: "N/A", value: null });
+        return employees.filter(item => item.value !== employeeAnswer.employeeId);
+      },
+    },
+  ]);
+  try {
+    // Wrap the columns to update in an object
+    const employee = {
+      manager_id: managerAnswer.managerId,
+    };
+    // Call database to update employee object
+    const result = await db.updateEmployee(employee, employeeAnswer.employeeId);
+    // If the update was successful, affectedRows = 1
+    if (result.affectedRows) {
+      console.log(`Manager updated.`);
     } else {
       console.log(`Error updating employee.`);
     }
